@@ -87,7 +87,7 @@ function App() {
     const timer = setInterval(() => {
       setPracticeSession(prev => {
         if (!prev) return null;
-        
+
         if (prev.timeLeft <= 1) {
           // Move to next word
           const currentList = wordLists.find(l => l.id === prev.listId);
@@ -95,11 +95,16 @@ function App() {
 
           const nextIndex = prev.isRandom 
             ? Math.floor(Math.random() * currentList.words.length)
-            : (prev.currentWordIndex + 1) % currentList.words.length;
+            : prev.currentWordIndex + 1;
+
+          // If sequential and reached end, stop practice
+          if (!prev.isRandom && nextIndex >= currentList.words.length) {
+            return null; // End practice
+          }
 
           return {
             ...prev,
-            currentWordIndex: nextIndex,
+            currentWordIndex: prev.isRandom ? nextIndex : nextIndex % currentList.words.length,
             timeLeft: prev.duration,
             completedWords: prev.completedWords + 1
           };
